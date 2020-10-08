@@ -109,7 +109,7 @@ This enables classification of images between the ``Defective`` and ``Non Defect
 
 ## 6. 
 
-### Crop large image of size 2150*3124 into smaller pieces (224*224*3).
+### Crop large image of size (2150 * 3124) into smaller pieces (224 * 224 * 3).
 ```python
 python cropped_cv.py
 ```
@@ -140,6 +140,8 @@ with percentage of each category.
 ```python
 python3 gradcam_orig.py
 ```
+<img src="D:/Download Chriome/cat-dog.png" width="750"/><br>
+
 This script picks the images from datasets folder , preprocess it and feed to the model which creates heatmap on defective part of the image in case if the image is defective else
 returns the image without any changes.
 
