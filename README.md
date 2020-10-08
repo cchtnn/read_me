@@ -140,7 +140,7 @@ with percentage of each category.
 ```python
 python3 gradcam_orig.py
 ```
-<img src="D:/Download Chriome/cat-dog.png" width="750"/><br>
+<img src="imgs/cat-dog.png" width="750"/><br>
 
 This script picks the images from datasets folder , preprocess it and feed to the model which creates heatmap on defective part of the image in case if the image is defective else
 returns the image without any changes.
