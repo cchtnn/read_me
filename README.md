@@ -1,7 +1,9 @@
 # Automated Optical Inspection
 
 ## 1. Introduction
-Automated Optical Inspection is an automatic defect tracking method for interpretation of tabular data in document images. We present an improved deep learning-based end to end approach for solving both problems of table detection and structure recognition using a single Convolution Neural Network (CNN) model. CascadeTabNet is a Cascade mask Region-based CNN High-Resolution Network (Cascade mask R-CNN HRNet) based model that detects the regions of tables and recognizes the structural body cells from the detected tables at the same time. We evaluate our results on ICDAR 2013, ICDAR 2019 and TableBank public datasets. We achieved 3rd rank in ICDAR 2019 post-competition results for table detection while attaining the best accuracy results for the ICDAR 2013 and TableBank dataset. We also attain the highest accuracy results on the ICDAR 2019 table structure recognition dataset. 
+Automated Optical Inspection is an automatic defect tracking method for detecting defect in sample scanned images. 
+We present an improved deep learning-based end to end approach for solving problems of detection defective images 
+using a pre trained resnet50 and GRAD-CAM model. 
 
 <img src="imgs/main_res.png"/>
 
@@ -14,7 +16,6 @@ conda install -y jupyter
 conda create --name torch python==3.7
 conda activate torch
 conda install nb_conda
-
 git clone https://github.com/jacobgil/pytorch-grad-cam.git
 pip install -r {"requirements.txt"}
 pip install pillow==7.2.0
@@ -72,70 +73,87 @@ Create the ``training_dataset`` ,``testing_dataset``, ``validatation_dataset``, 
 |    |    
 |    | 
      --------------Defect   
-|    |             1.png
-|    |             2.png
+|    |             1:a.png
+|    |             2:b.png
 |    |
 |    --------------Non Defect
-|    |             1.png
-|    |             2.png
+|    |             1.c.png
+|    |             2:d.png
 |    |
 |    ---- /test
      |    
 |    | 
      --------------Defect 
-|    |             1.png
-|    |             2.png
+|    |             1:d.png
+|    |             2:e.png
 |    |
 |    --------------Non Defect   
-|    |
-|    |
+|    |             1:f.png
+|    |             2:g.png
+|    |             
 |    ---- /valid
 |    |
 |    |
 |    ---------------Defect
-|    |
-|    |
+|    |             1:f.png
+|    |             ....
 |    |
 |    ---------------Non Defect
-|     
+|    |              1:f.png
+|    |              ....
+|    |
 ```
 This enables classification of images between the ``Defective`` and ``Non Defective`` data sets.
 
 > Make sure to include multiple variants of the subject (side profiles, zoomed in images etc.), the more the images, the better is the result.
 
 ## 6. 
+
+### Crop large image of size 2150*3124 into smaller pieces (224*224*3).
+```python
+python cropped_cv.py
+```
+
+
 ### Model Training (Initiate transfer learning)
 Go to the project directory and run -
 ```python
-$ bash train.sh
+python transfer_learning.py
 ```
 
-This script installs the ``Inception`` model and initiates the re-training process for the specified image data sets.
+This script creates the augmented images and initiates the re-training process for the specified image data sets. The final layer of the resnet50 model was 
+changed for fine tuning. We are using Adam as the optimizaer.
 
-Once the process is complete, it will return a training accuracy somewhere between ``85% - 100%``.
+Once the process is complete, it will return a training accuracy somewhere between ``85% - 95%``.
 
-The ``training summaries``, ``retrained graphs`` and ``retrained labels`` will be saved in a folder named ``tf_files``.
+After successfull completion of model training and validation, model weights will be saved in a root folder named ``CV_Project``.
 
 ### Testing Model's Accuracy on sample Images
-```javascript
+```python
 python3 test_acc.py
 ```
 
-This script picks the images from datasets folder , preprocess it and feed to the model which predicts whether the image is Defective or Non Defective with percentage.
+This script picks the images from "datasets" folder , preprocess it and feed to the model which predicts whether the image is Defective or Non Defective
+with percentage of each category.
 
 ### Create Heatmap on sample Image
-```javascript
+```python
 python3 gradcam_orig.py
 ```
 This script picks the images from datasets folder , preprocess it and feed to the model which creates heatmap on defective part of the image in case if the image is defective else
 returns the image without any changes.
+
+Reference : https://github.com/jacobgil/pytorch-grad-cam
+
+Note : Added loop in the code so that in case if multiple image will be passed as input then it will generate multiple images with heatmaps on it. Using model created from
+transfer_learning.py script.
 
 ## 7. Datasets
 
 1) Full Dataset(Image Files) is present on Microsoft Azure Storage Container <br>
 Dataset Path :  /Curated/MedicalDevices/tmp/CS_Project/EEPReg_Cropped<br>
 
-2) Cropped Images of  Dataset (ICDAR 19 + Marmot + Github)<br>
+2) Cropped Images of Large sample image is present on Microsoft Azure Storage Container <br>
 Dataset Path : /Curated/MedicalDevices/tmp/CS_Project/datasets<br>
 
 ## 8. Training
