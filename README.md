@@ -2,13 +2,14 @@
 
 ## 1. Introduction
 Automated Optical Inspection is an automatic defect tracking method for detecting defect in sample scanned images. 
-We present an improved deep learning-based end to end approach for solving problems of detection defective images 
-using a pre trained resnet50 and GRAD-CAM model. 
+We present an improved deep learning-based end to end approach for solving problems of detection of defective images 
+using a pre trained resnet50 and GRAD-CAM model. We are removing last layer from resnet50 model in order to perform fine tuning.
+The output will be the image with defect and no defect(Percentage Attached).
 
 <img src="imgs/main_res.png"/>
 
 ## 2. Setup
-<b>Models are developed in Pytorch based <a href="https://github.com/open-mmlab/mmdetection">MMdetection</a> framework (Version 1.2)</b>
+<b>Models are developed in Pytorch framework (Version 1.6)</b>
 <br>
 
 <pre>
@@ -107,13 +108,16 @@ This enables classification of images between the ``Defective`` and ``Non Defect
 
 > Make sure to include multiple variants of the subject (side profiles, zoomed in images etc.), the more the images, the better is the result.
 
-## 6. 
+## 6. Explaination of each script used in root folder for Prediction of Output.
 
 ### Crop large image of size (2150 * 3124) into smaller pieces (224 * 224 * 3).
 ```python
 python cropped_cv.py
 ```
+<img src="imgs/cat-dog.png" width="750"/><br>
 
+This script crops the one large image of size (2150 * 3124) into smaller pieces of size (224 * 224 * 3). Which will be fed as input to machine learning model
+to predict output.
 
 ### Model Training (Initiate transfer learning)
 Go to the project directory and run -
@@ -134,7 +138,7 @@ python3 test_acc.py
 ```
 
 This script picks the images from "datasets" folder , preprocess it and feed to the model which predicts whether the image is Defective or Non Defective
-with percentage of each category.
+with percentage of each category. This scripts call the "gradcam_orig.py" scripts and creates the output automatically.
 
 ### Create Heatmap on sample Image
 ```python
@@ -145,7 +149,11 @@ python3 gradcam_orig.py
 This script picks the images from datasets folder , preprocess it and feed to the model which creates heatmap on defective part of the image in case if the image is defective else
 returns the image without any changes.
 
-Reference : https://github.com/jacobgil/pytorch-grad-cam
+**Note : want to run the script. Refer the below command.
+Usage: `python gradcam.py --image-path <path_to_image>`
+
+To use with CUDA:
+`python gradcam.py --image-path <path_to_image> --use-cuda`
 
 Note : Added loop in the code so that in case if multiple image will be passed as input then it will generate multiple images with heatmaps on it. Using model created from
 transfer_learning.py script.
